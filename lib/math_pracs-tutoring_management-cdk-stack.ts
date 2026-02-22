@@ -304,5 +304,18 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       value: groqCredentialsSecret.secretArn,
       description: CFN_OUTPUT_GROQ_CREDENTIALS_SECRET_DESCRIPTION
     });
+
+    // Cross-stack exports for MathPracsSessionRemindersCDK
+    new cdk.CfnOutput(this, 'SessionsTableArn', {
+      value: sessionsTable.tableArn,
+      description: 'ARN of Sessions DynamoDB Table',
+      exportName: 'MathPracs-SessionsTable-Arn'
+    });
+
+    new cdk.CfnOutput(this, 'StudentsTableArn', {
+      value: studentsTable.tableArn,
+      description: 'ARN of Students DynamoDB Table',
+      exportName: 'MathPracs-StudentsTable-Arn'
+    });
   }
 }
