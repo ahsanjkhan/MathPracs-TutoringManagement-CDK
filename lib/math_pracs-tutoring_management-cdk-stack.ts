@@ -192,6 +192,10 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       handler: TUTORING_MANAGEMENT_LAMBDA_HANDLER,
       timeout: TUTORING_MANAGEMENT_LAMBDA_TIMEOUT,
       memorySize: TUTORING_MANAGEMENT_LAMBDA_MEMORY_SIZE,
+      bundling: {
+      assetExcludes: ['.venv', '__pycache__', '.git', '.idea', 'tests',
+  'discord_bot', '*.pyc', '*.pkg', 'node_modules', '*.md', 'scripts'],
+    },
     });
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_AWS_REGION, this.region);
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_TUTORS_TABLE, tutorsTable.tableName);
