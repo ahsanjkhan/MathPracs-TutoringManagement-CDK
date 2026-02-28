@@ -129,6 +129,50 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
+    // V2 Tables - Duplicates with all current fields
+    const tutorsV2Table = new dynamodb.Table(this, 'TutorsV2Table', {
+      tableName: 'TutorsV2',
+      partitionKey: { name: 'tutorId', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    // Add GSI for calendar ID lookup (same as original)
+    tutorsV2Table.addGlobalSecondaryIndex({
+      indexName: 'calendarId-index',
+      partitionKey: { name: 'calendarId', type: dynamodb.AttributeType.STRING },
+    });
+
+    const tutorsMetadataV2Table = new dynamodb.Table(this, 'TutorsMetadataV2Table', {
+      tableName: 'TutorsMetadataV2',
+      partitionKey: { name: 'tutorId', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    const studentsV2Table = new dynamodb.Table(this, 'StudentsV2Table', {
+      tableName: 'StudentsV2',
+      partitionKey: { name: 'studentName', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    const studentsMetadataV2Table = new dynamodb.Table(this, 'StudentsMetadataV2Table', {
+      tableName: 'StudentsMetadataV2',
+      partitionKey: { name: 'studentName', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    // Transactions table (new)
+    const transactionsTable = new dynamodb.Table(this, 'TransactionsTable', {
+      tableName: 'Transactions',
+      partitionKey: { name: 'studentName', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'transactionKey', type: dynamodb.AttributeType.STRING }, // format: "DEBIT#2026-03-01T18:00:00Z"
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
     // Secrets for API credentials
     const googleCredentialsSecret = new secretsmanager.Secret(this, GOOGLE_CREDENTIALS_SECRET_ID, {
       secretName: GOOGLE_CREDENTIALS_SECRET_NAME,
@@ -214,6 +258,13 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
     sessionsTable.grantReadWriteData(tutoringManagementLambda);
     calendarSyncTable.grantReadWriteData(tutoringManagementLambda);
     studentsTable.grantReadWriteData(tutoringManagementLambda);
+
+    // Grant Lambda permissions for V2 tables
+    tutorsV2Table.grantReadWriteData(tutoringManagementLambda);
+    tutorsMetadataV2Table.grantReadWriteData(tutoringManagementLambda);
+    studentsV2Table.grantReadWriteData(tutoringManagementLambda);
+    studentsMetadataV2Table.grantReadWriteData(tutoringManagementLambda);
+    transactionsTable.grantReadWriteData(tutoringManagementLambda);
 
     googleCredentialsSecret.grantRead(tutoringManagementLambda);
     dropboxCredentialsSecret.grantRead(tutoringManagementLambda);
@@ -309,6 +360,32 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       description: CFN_OUTPUT_GROQ_CREDENTIALS_SECRET_DESCRIPTION
     });
 
+    // Outputs for V2 tables
+    new cdk.CfnOutput(this, 'TutorsV2TableOutput', {
+      value: tutorsV2Table.tableName,
+      description: 'TutorsV2 DynamoDB Table Name'
+    });
+
+    new cdk.CfnOutput(this, 'TutorsMetadataV2TableOutput', {
+      value: tutorsMetadataV2Table.tableName,
+      description: 'TutorsMetadataV2 DynamoDB Table Name'
+    });
+
+    new cdk.CfnOutput(this, 'StudentsV2TableOutput', {
+      value: studentsV2Table.tableName,
+      description: 'StudentsV2 DynamoDB Table Name'
+    });
+
+    new cdk.CfnOutput(this, 'StudentsMetadataV2TableOutput', {
+      value: studentsMetadataV2Table.tableName,
+      description: 'StudentsMetadataV2 DynamoDB Table Name'
+    });
+
+    new cdk.CfnOutput(this, 'TransactionsTableOutput', {
+      value: transactionsTable.tableName,
+      description: 'Transactions DynamoDB Table Name'
+    });
+
     // Cross-stack exports for MathPracsSessionRemindersCDK
     new cdk.CfnOutput(this, 'SessionsTableArn', {
       value: sessionsTable.tableArn,
@@ -320,6 +397,11 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       value: studentsTable.tableArn,
       description: 'ARN of Students DynamoDB Table',
       exportName: 'MathPracs-StudentsTable-Arn'
+    });
+    new cdk.CfnOutput(this, 'DiscordCredentialsSecretArnExport', {
+      value: discordCredentialsSecret.secretArn,
+      description: 'ARN of Discord Credentials Secret',
+      exportName: 'MathPracs-DiscordCredentials-Arn'
     });
   }
 }
