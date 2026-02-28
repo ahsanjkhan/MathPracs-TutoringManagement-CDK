@@ -43,6 +43,9 @@ import {
   TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_SESSIONS_TABLE,
   TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_CALENDAR_SYNC_TABLE,
   TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_STUDENTS_TABLE,
+  TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_TUTORS_METADATA_TABLE,
+  TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_STUDENTS_METADATA_TABLE,
+  TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_TRANSACTIONS_TABLE,
   TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_GOOGLE_CREDENTIALS_SECRET,
   TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_DROPBOX_CREDENTIALS_SECRET,
   TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_DISCORD_CREDENTIALS_SECRET,
@@ -242,10 +245,13 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
     },
     });
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_AWS_REGION, this.region);
-    tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_TUTORS_TABLE, tutorsTable.tableName);
+    tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_TUTORS_TABLE, tutorsV2Table.tableName);
+    tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_TUTORS_METADATA_TABLE, tutorsMetadataV2Table.tableName);
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_SESSIONS_TABLE, sessionsTable.tableName);
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_CALENDAR_SYNC_TABLE, calendarSyncTable.tableName);
-    tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_STUDENTS_TABLE, studentsTable.tableName);
+    tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_STUDENTS_TABLE, studentsV2Table.tableName);
+    tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_STUDENTS_METADATA_TABLE, studentsMetadataV2Table.tableName);
+    tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_TRANSACTIONS_TABLE, transactionsTable.tableName);
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_GOOGLE_CREDENTIALS_SECRET, googleCredentialsSecret.secretName);
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_DROPBOX_CREDENTIALS_SECRET, dropboxCredentialsSecret.secretName);
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_DISCORD_CREDENTIALS_SECRET, discordCredentialsSecret.secretName);
