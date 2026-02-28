@@ -242,10 +242,10 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
     },
     });
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_AWS_REGION, this.region);
-    tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_TUTORS_TABLE, tutorsV2Table.tableName);
+    tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_TUTORS_TABLE, tutorsTable.tableName);
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_SESSIONS_TABLE, sessionsTable.tableName);
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_CALENDAR_SYNC_TABLE, calendarSyncTable.tableName);
-    tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_STUDENTS_TABLE, studentsV2Table.tableName);
+    tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_STUDENTS_TABLE, studentsTable.tableName);
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_GOOGLE_CREDENTIALS_SECRET, googleCredentialsSecret.secretName);
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_DROPBOX_CREDENTIALS_SECRET, dropboxCredentialsSecret.secretName);
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_DISCORD_CREDENTIALS_SECRET, discordCredentialsSecret.secretName);
@@ -398,13 +398,6 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       description: 'ARN of Students DynamoDB Table',
       exportName: 'MathPracs-StudentsTable-Arn'
     });
-
-    new cdk.CfnOutput(this, 'StudentsV2TableArn', {
-      value: studentsV2Table.tableArn,
-      description: 'ARN of StudentsV2 DynamoDB Table',
-      exportName: 'MathPracs-StudentsV2Table-Arn'
-    });
-
     new cdk.CfnOutput(this, 'DiscordCredentialsSecretArnExport', {
       value: discordCredentialsSecret.secretArn,
       description: 'ARN of Discord Credentials Secret',
