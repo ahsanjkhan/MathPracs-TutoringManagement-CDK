@@ -407,5 +407,17 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       description: 'ARN of Discord Credentials Secret',
       exportName: 'MathPracs-DiscordCredentials-Arn'
     });
+
+    new cdk.CfnOutput(this, 'StudentsV2TableArn', {
+      value: studentsV2Table.tableArn,
+      description: 'ARN of StudentsV2 DynamoDB Table',
+      exportName: 'MathPracs-StudentsV2Table-Arn'
+    });
+
+    new cdk.CfnOutput(this, 'StudentsMetadataV2TableArn', {
+      value: studentsMetadataV2Table.tableArn,
+      description: 'ARN of StudentsMetadataV2 DynamoDB Table',
+      exportName: 'MathPracs-StudentsMetadataV2Table-Arn'
+    });
   }
 }
