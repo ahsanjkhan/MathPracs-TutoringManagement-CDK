@@ -6,7 +6,6 @@ import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
-import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 import {
   TUTORS_TABLE_NAME,
@@ -114,14 +113,14 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       partitionKey: { name: 'tutorId', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'sessionId', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      removalPolicy: cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
     });
 
     const calendarSyncTable = new dynamodb.Table(this, CALENDAR_SYNC_TABLE_ID, {
       tableName: CALENDAR_SYNC_TABLE_NAME,
       partitionKey: { name: 'syncType', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      removalPolicy: cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
     });
 
     const studentsTable = new dynamodb.Table(this, STUDENTS_TABLE_ID, {
@@ -136,7 +135,7 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       tableName: 'TutorsV2',
       partitionKey: { name: 'tutorId', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      removalPolicy: cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
     });
 
     // Add GSI for calendar ID lookup (same as original)
@@ -149,21 +148,21 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       tableName: 'TutorsMetadataV2',
       partitionKey: { name: 'tutorId', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      removalPolicy: cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
     });
 
     const studentsV2Table = new dynamodb.Table(this, 'StudentsV2Table', {
       tableName: 'StudentsV2',
       partitionKey: { name: 'studentName', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      removalPolicy: cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
     });
 
     const studentsMetadataV2Table = new dynamodb.Table(this, 'StudentsMetadataV2Table', {
       tableName: 'StudentsMetadataV2',
       partitionKey: { name: 'studentName', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      removalPolicy: cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
     });
 
     // Transactions table (new)
@@ -172,7 +171,7 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       partitionKey: { name: 'studentName', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'transactionKey', type: dynamodb.AttributeType.STRING }, // format: "DEBIT#2026-03-01T18:00:00Z"
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      removalPolicy: cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
     });
 
     // Secrets for API credentials
