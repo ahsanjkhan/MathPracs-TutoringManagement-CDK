@@ -431,5 +431,11 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       description: 'ARN of TutorsMetadataV2 DynamoDB Table',
       exportName: 'MathPracs-TutorsMetadataV2Table-Arn'
     });
+
+    new cdk.CfnOutput(this, 'TransactionsTableArn', {
+      value: transactionsTable.tableArn,
+      description: 'ARN of Transactions DynamoDB Table',
+      exportName: 'MathPracs-TransactionsTable-Arn'
+    });
   }
 }
