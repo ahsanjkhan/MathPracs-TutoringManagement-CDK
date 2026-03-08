@@ -1,81 +1,51 @@
 ### What Is This
 
-This is the Infrastructure-as-Code for the MathPracs Tutoring Management API - a FastAPI-based serverless application that manages tutoring sessions, students, and integrates with Google Calendar, Dropbox, and Discord.
-
-### Dependencies
-
-This stack depends on the **MathPracsPaymentRemindersCDK** stack being deployed first, as it imports shared resources like DynamoDB tables and secrets.
+This is the Infrastructure-as-Code for the MathPracs Tutoring Management API - a FastAPI-based serverless application that manages tutoring sessions, students, and integrates with Google APIs, Dropbox, and Discord.
 
 ### How Does It Work
 
 This CDK stack creates:
 
-1. **AWS Lambda Function** - FastAPI application with Mangum adapter
-2. **AWS API Gateway** - REST API with proxy integration
-3. **AWS DynamoDB Tables** - Tutors, Sessions, Students, CalendarListState
-4. **AWS Secrets Manager** - Google, Dropbox, Discord, and Groq API credentials
-5. **Cross-stack imports** - Payment reminder tables and secrets
+1. **AWS CodePipeline** - Auto-deploys on merge or push into `main`
+2. **AWS Lambda Function** - FastAPI application with Mangum adapter
+3. **AWS API Gateway** - REST API with proxy integration
+4. **AWS DynamoDB Tables** - Sessions, CalendarListState, TutorsV2, TutorsMetadataV2, StudentsV2, StudentsMetadataV2, Transactions
+5. **AWS Secrets Manager** - Google, Dropbox, Discord, and Groq API credentials
+6. **AWS SSM Parameter Store** - Google Drive parent folder ID, Dropbox parent folder path
+7. **AWS EventBridge Rule** - Triggers session sync every 3 minutes
 
 ### What Are The Components
 
-AWS Lambda, AWS API Gateway, AWS DynamoDB, AWS Secrets Manager, Google Calendar API, Google Sheets API, Dropbox API, Discord API, Groq API.
+AWS CodePipeline, AWS Lambda, AWS API Gateway, AWS DynamoDB, AWS Secrets Manager, AWS SSM Parameter Store, AWS EventBridge, Google API, Dropbox API, Discord API, Groq API.
 
 ### How To Deploy
 
-### Prerequisites
+Raising a Pull Request for commits on a feature branch, getting it approved, and squashing and merging into `main` on either this repo or [MathPracs-TutoringManagement-API](https://github.com/ahsanjkhan/MathPracs-TutoringManagement-API) automatically triggers the CodePipeline, which runs CDK synth and deploys the stack.
 
-1. **Have the MathPracs-TutoringManagement-API repository also setup in your project in addition to this repository**
-2. **Install Node.js** (version 18 or later)
-3. **Install AWS CLI** and configure with your credentials
-4. **Install Finch** (Docker alternative for CDK Python bundling)
+#### First-Time Setup
 
-### Install Node.js
-```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-
-source ~/.bashrc
-
-nvm install 20
-nvm use 20
-nvm alias default 20
-```
-
-#### Setup Finch
-
-**macOS (using Homebrew):**
-```bash
-brew install finch
-finch vm init
-finch vm start
-```
-
-#### Deploy the Stack
-
-0. **Set Node JS Version:**
-   ```bash
-   node --version # should show 20.x
-   nvm use 20 # switch to 20 if it does not
-   node --version # verify that it shows 20.x now
-   ```
-
-1. **Install dependencies:**
+1. **Install Node.js** (version 20), **AWS CLI**, and **Finch** (`brew install finch && finch vm init && finch vm start`)
+2. **Bootstrap CDK:** `npx cdk bootstrap`
+3. **Deploy the pipeline stack:**
    ```bash
    npm install
+   CDK_DOCKER=finch npx cdk deploy MathPracsTutoringManagementPipelineStack
    ```
 
-2. **Bootstrap CDK (first time only):**
+After this, all future changes are deployed automatically via the pipeline.
+
+#### Manual Deployments (Avoid if possible)
+1. Make changes on feature branch.
+2. Commit those changes and raise Pull Request as usual.
+3. Deploy the changes directly:
    ```bash
-   npx cdk bootstrap
+   CDK_DOCKER=finch npx cdk deploy MathPracsTutoringManagementCdkStack
    ```
 
-3. **Deploy with Finch:****
-   ```bash
-   CDK_DOCKER=finch npx cdk deploy
-   ```
 
 #### Update Secrets
 
-After deployment, update the AWS Secrets Manager secrets with your API credentials:
+After deployment, update the AWS Secrets Manager secrets with your API credentials using either the CLI (sample shown below) or through the AWS Console:
 
 ```bash
 # Google credentials
@@ -93,24 +63,22 @@ aws secretsmanager update-secret --secret-id tutoring-api/groq-credentials-cdk -
 
 #### Access the API
 
-After deployment, you'll get two URLs:
-- **API URL**: For making API calls
-- **API Docs URL**: For viewing FastAPI documentation (Swagger UI)
+After deployment, CRUD commands can be run through the Discord Server.
 
 ### Useful Commands
 
 - `CDK_DOCKER=finch npx cdk diff` - Compare deployed stack with current state
 - `CDK_DOCKER=finch npx cdk synth` - Emit the synthesized CloudFormation template
 - `CDK_DOCKER=finch npx cdk deploy` - Deploy with Finch Docker support
-- `CDK_DOCKER=finch npx cdk destroy` - Destroy the stack
+- `CDK_DOCKER=finch npx cdk destroy` - Destroy the stack # DANGEROUS!!
 - `finch vm status` - See Finch VM Status
 - `finch vm stop` - Stop Finch VM
 
 ### Stack Dependencies
 
-This stack imports the following from **MathPracsPaymentRemindersCDK**:
-- Student Payment DynamoDB Table
-- Tutor Payment DynamoDB Table
+This stack exports resources consumed by other stacks:
+- **MathPracsPaymentRemindersCDK**: Sessions, StudentsV2, StudentsMetadataV2, TutorsV2, TutorsMetadataV2, Transactions DynamoDB Tables, Discord API Secrets
+- **MathPracsSessionRemindersCDK**: Sessions, Students, StudentsV2, StudentsMetadataV2 DynamoDB Tables
 
 ### EventBridge Automation
 
