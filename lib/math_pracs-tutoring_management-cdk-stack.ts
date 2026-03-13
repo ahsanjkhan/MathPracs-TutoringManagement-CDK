@@ -8,14 +8,10 @@ import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { Construct } from 'constructs';
 import {
-  TUTORS_TABLE_NAME,
-  TUTORS_TABLE_ID,
   SESSIONS_TABLE_NAME,
   SESSIONS_TABLE_ID,
   CALENDAR_SYNC_TABLE_NAME,
   CALENDAR_SYNC_TABLE_ID,
-  STUDENTS_TABLE_NAME,
-  STUDENTS_TABLE_ID,
   GOOGLE_CREDENTIALS_SECRET_NAME,
   GOOGLE_CREDENTIALS_SECRET_ID,
   GOOGLE_CREDENTIALS_SECRET_DESCRIPTION,
@@ -58,14 +54,10 @@ import {
   TUTORING_MANAGEMENT_API_NAME,
   TUTORING_MANAGEMENT_API_ID,
   TUTORING_MANAGEMENT_API_DESCRIPTION,
-  CFN_OUTPUT_TUTORS_TABLE_ID,
-  CFN_OUTPUT_TUTORS_TABLE_DESCRIPTION,
   CFN_OUTPUT_SESSIONS_TABLE_ID,
   CFN_OUTPUT_SESSIONS_TABLE_DESCRIPTION,
   CFN_OUTPUT_CALENDAR_SYNC_TABLE_ID,
   CFN_OUTPUT_CALENDAR_SYNC_TABLE_DESCRIPTION,
-  CFN_OUTPUT_STUDENTS_TABLE_ID,
-  CFN_OUTPUT_STUDENTS_TABLE_DESCRIPTION,
   CFN_OUTPUT_TUTORING_MANAGEMENT_LAMBDA_ID,
   CFN_OUTPUT_TUTORING_MANAGEMENT_LAMBDA_DESCRIPTION,
   CFN_OUTPUT_API_URL_ID,
@@ -95,19 +87,6 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
 
 
     // DynamoDB Tables
-    const tutorsTable = new dynamodb.Table(this, TUTORS_TABLE_ID, {
-      tableName: TUTORS_TABLE_NAME,
-      partitionKey: { name: 'tutorId', type: dynamodb.AttributeType.STRING },
-      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-    });
-
-    // Add GSI for calendar ID lookup
-    tutorsTable.addGlobalSecondaryIndex({
-      indexName: 'calendarId-index',
-      partitionKey: { name: 'calendarId', type: dynamodb.AttributeType.STRING },
-    });
-
     const sessionsTable = new dynamodb.Table(this, SESSIONS_TABLE_ID, {
       tableName: SESSIONS_TABLE_NAME,
       partitionKey: { name: 'tutorId', type: dynamodb.AttributeType.STRING },
@@ -121,13 +100,6 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       partitionKey: { name: 'syncType', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
-    });
-
-    const studentsTable = new dynamodb.Table(this, STUDENTS_TABLE_ID, {
-      tableName: STUDENTS_TABLE_NAME,
-      partitionKey: { name: 'studentName', type: dynamodb.AttributeType.STRING },
-      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
     // V2 Tables - Duplicates with all current fields
@@ -257,10 +229,8 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_DROPBOX_PARENT_FOLDER_SSM, dropboxParentFolderParam.parameterName);
 
     // Grant Lambda permissions
-    tutorsTable.grantReadWriteData(tutoringManagementLambda);
     sessionsTable.grantReadWriteData(tutoringManagementLambda);
     calendarSyncTable.grantReadWriteData(tutoringManagementLambda);
-    studentsTable.grantReadWriteData(tutoringManagementLambda);
 
     // Grant Lambda permissions for V2 tables
     tutorsV2Table.grantReadWriteData(tutoringManagementLambda);
@@ -308,11 +278,6 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
     }));
 
     // Outputs
-    new cdk.CfnOutput(this, CFN_OUTPUT_TUTORS_TABLE_ID, {
-      value: tutorsTable.tableName,
-      description: CFN_OUTPUT_TUTORS_TABLE_DESCRIPTION
-    });
-
     new cdk.CfnOutput(this, CFN_OUTPUT_SESSIONS_TABLE_ID, {
       value: sessionsTable.tableName,
       description: CFN_OUTPUT_SESSIONS_TABLE_DESCRIPTION
@@ -321,11 +286,6 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
     new cdk.CfnOutput(this, CFN_OUTPUT_CALENDAR_SYNC_TABLE_ID, {
       value: calendarSyncTable.tableName,
       description: CFN_OUTPUT_CALENDAR_SYNC_TABLE_DESCRIPTION
-    });
-
-    new cdk.CfnOutput(this, CFN_OUTPUT_STUDENTS_TABLE_ID, {
-      value: studentsTable.tableName,
-      description: CFN_OUTPUT_STUDENTS_TABLE_DESCRIPTION
     });
 
     new cdk.CfnOutput(this, CFN_OUTPUT_TUTORING_MANAGEMENT_LAMBDA_ID, {
@@ -396,11 +356,6 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       exportName: 'MathPracs-SessionsTable-Arn'
     });
 
-    new cdk.CfnOutput(this, 'StudentsTableArn', {
-      value: studentsTable.tableArn,
-      description: 'ARN of Students DynamoDB Table',
-      exportName: 'MathPracs-StudentsTable-Arn'
-    });
     new cdk.CfnOutput(this, 'DiscordCredentialsSecretArnExport', {
       value: discordCredentialsSecret.secretArn,
       description: 'ARN of Discord Credentials Secret',
