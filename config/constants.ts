@@ -2,17 +2,11 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as cdk from "aws-cdk-lib";
 
 // DynamoDB Tables
-export const TUTORS_TABLE_NAME = 'Tutors';
-export const TUTORS_TABLE_ID = 'TutorsTable';
-
 export const SESSIONS_TABLE_NAME = 'Sessions';
 export const SESSIONS_TABLE_ID = 'SessionsTable';
 
 export const CALENDAR_SYNC_TABLE_NAME = 'CalendarListState';
 export const CALENDAR_SYNC_TABLE_ID = 'CalendarSyncTable';
-
-export const STUDENTS_TABLE_NAME = 'Students';
-export const STUDENTS_TABLE_ID = 'StudentsTable';
 
 // Secrets Manager
 export const GOOGLE_CREDENTIALS_SECRET_NAME = 'tutoring-api/google-credentials-cdk';
@@ -77,17 +71,11 @@ export const TUTORING_MANAGEMENT_API_ID = 'TutoringManagementApi';
 export const TUTORING_MANAGEMENT_API_DESCRIPTION = 'API for managing tutoring sessions and student data';
 
 // CloudFormation Outputs
-export const CFN_OUTPUT_TUTORS_TABLE_ID = 'TutorsTableName';
-export const CFN_OUTPUT_TUTORS_TABLE_DESCRIPTION = 'DynamoDB table name for tutors';
-
 export const CFN_OUTPUT_SESSIONS_TABLE_ID = 'SessionsTableName';
 export const CFN_OUTPUT_SESSIONS_TABLE_DESCRIPTION = 'DynamoDB table name for sessions';
 
 export const CFN_OUTPUT_CALENDAR_SYNC_TABLE_ID = 'CalendarSyncTableName';
 export const CFN_OUTPUT_CALENDAR_SYNC_TABLE_DESCRIPTION = 'DynamoDB table name for calendar sync state';
-
-export const CFN_OUTPUT_STUDENTS_TABLE_ID = 'StudentsTableName';
-export const CFN_OUTPUT_STUDENTS_TABLE_DESCRIPTION = 'DynamoDB table name for students';
 
 export const CFN_OUTPUT_TUTORING_MANAGEMENT_LAMBDA_ID = 'TutoringManagementLambdaFunctionName';
 export const CFN_OUTPUT_TUTORING_MANAGEMENT_LAMBDA_DESCRIPTION = 'Tutoring Management Lambda function name';
