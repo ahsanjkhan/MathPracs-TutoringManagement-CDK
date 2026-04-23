@@ -4,6 +4,7 @@ import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
+import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { Construct } from 'constructs';
@@ -75,7 +76,15 @@ import {
   SYNC_SESSIONS_EVENTBRIDGE_RULE_NAME,
   SYNC_SESSIONS_EVENTBRIDGE_RULE_ID,
   SYNC_SESSIONS_EVENTBRIDGE_RULE_DESCRIPTION,
-  SYNC_SESSIONS_EVENTBRIDGE_RULE_SCHEDULE_EXPRESSION, TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_PARENT_DRIVE_FOLDER_ID_SSM,
+  SYNC_SESSIONS_EVENTBRIDGE_RULE_SCHEDULE_EXPRESSION,
+  ARCHIVE_DROPBOX_EVENTBRIDGE_RULE_NAME,
+  ARCHIVE_DROPBOX_EVENTBRIDGE_RULE_ID,
+  ARCHIVE_DROPBOX_EVENTBRIDGE_RULE_DESCRIPTION,
+  ARCHIVE_DROPBOX_EVENTBRIDGE_RULE_SCHEDULE_EXPRESSION,
+  DROPBOX_ARCHIVE_BUCKET_NAME,
+  DROPBOX_ARCHIVE_BUCKET_ID,
+  TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_DROPBOX_ARCHIVE_BUCKET,
+  TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_PARENT_DRIVE_FOLDER_ID_SSM,
   TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_TUTORS_METADATA_TABLE,
   TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_STUDENTS_METADATA_TABLE
 } from "../config/constants";
@@ -200,6 +209,12 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       description: DROPBOX_PARENT_FOLDER_SSM_DESCRIPTION
     });
 
+    // S3 Archive Bucket for Dropbox files
+    const dropboxArchiveBucket = new s3.Bucket(this, DROPBOX_ARCHIVE_BUCKET_ID, {
+      bucketName: DROPBOX_ARCHIVE_BUCKET_NAME,
+      removalPolicy: cdk.RemovalPolicy.RETAIN,
+    });
+
     // Tutoring Management API Lambda
     const tutoringManagementLambda = new python.PythonFunction(this, TUTORING_MANAGEMENT_LAMBDA_ID, {
       functionName: TUTORING_MANAGEMENT_LAMBDA_NAME,
@@ -227,6 +242,7 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_GROQ_CREDENTIALS_SECRET, groqCredentialsSecret.secretName);
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_PARENT_DRIVE_FOLDER_ID_SSM, parentDriveFolderIdParam.parameterName);
     tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_DROPBOX_PARENT_FOLDER_SSM, dropboxParentFolderParam.parameterName);
+    tutoringManagementLambda.addEnvironment(TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_DROPBOX_ARCHIVE_BUCKET, dropboxArchiveBucket.bucketName);
 
     // Grant Lambda permissions
     sessionsTable.grantReadWriteData(tutoringManagementLambda);
@@ -245,6 +261,7 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
     groqCredentialsSecret.grantRead(tutoringManagementLambda);
     parentDriveFolderIdParam.grantRead(tutoringManagementLambda);
     dropboxParentFolderParam.grantRead(tutoringManagementLambda);
+    dropboxArchiveBucket.grantReadWrite(tutoringManagementLambda);
 
     // API Gateway
     const api = new apigateway.RestApi(this, TUTORING_MANAGEMENT_API_ID, {
@@ -273,6 +290,23 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
         "detail-type": "Scheduled Event",
         "detail": {
           "action": "sync-sessions"
+        }
+      })
+    }));
+
+    // EventBridge Rule for Dropbox archive
+    const archiveDropboxRule = new events.Rule(this, ARCHIVE_DROPBOX_EVENTBRIDGE_RULE_ID, {
+      ruleName: ARCHIVE_DROPBOX_EVENTBRIDGE_RULE_NAME,
+      description: ARCHIVE_DROPBOX_EVENTBRIDGE_RULE_DESCRIPTION,
+      schedule: events.Schedule.expression(ARCHIVE_DROPBOX_EVENTBRIDGE_RULE_SCHEDULE_EXPRESSION),
+    });
+
+    archiveDropboxRule.addTarget(new targets.LambdaFunction(tutoringManagementLambda, {
+      event: events.RuleTargetInput.fromObject({
+        "source": "aws.events",
+        "detail-type": "Scheduled Event",
+        "detail": {
+          "action": "archive-dropbox-files"
         }
       })
     }));

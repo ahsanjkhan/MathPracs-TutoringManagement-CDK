@@ -103,3 +103,15 @@ export const SYNC_SESSIONS_EVENTBRIDGE_RULE_NAME = 'tutoring-management-sync-ses
 export const SYNC_SESSIONS_EVENTBRIDGE_RULE_ID = 'SyncSessionsSchedule';
 export const SYNC_SESSIONS_EVENTBRIDGE_RULE_DESCRIPTION = 'Triggers tutoring management sync sessions every 3 minutes';
 export const SYNC_SESSIONS_EVENTBRIDGE_RULE_SCHEDULE_EXPRESSION = 'rate(3 minutes)';
+
+export const ARCHIVE_DROPBOX_EVENTBRIDGE_RULE_NAME = 'tutoring-management-archive-dropbox-schedule';
+export const ARCHIVE_DROPBOX_EVENTBRIDGE_RULE_ID = 'ArchiveDropboxSchedule';
+export const ARCHIVE_DROPBOX_EVENTBRIDGE_RULE_DESCRIPTION = 'Triggers Dropbox to S3 archive job every Sunday at midnight Central (06:00 UTC)';
+export const ARCHIVE_DROPBOX_EVENTBRIDGE_RULE_SCHEDULE_EXPRESSION = 'cron(0 6 ? * SUN *)';
+
+// S3 Archive Bucket
+export const DROPBOX_ARCHIVE_BUCKET_NAME = 'mathpracs-dropbox-archive';
+export const DROPBOX_ARCHIVE_BUCKET_ID = 'DropboxArchiveBucket';
+
+// Environment Variables
+export const TUTORING_MANAGEMENT_LAMBDA_ENV_VAR_KEY_DROPBOX_ARCHIVE_BUCKET = 'TUTORING_DROPBOX_ARCHIVE_BUCKET';
