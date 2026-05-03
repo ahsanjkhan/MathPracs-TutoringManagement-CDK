@@ -211,7 +211,7 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
 
     // S3 Archive Bucket for Dropbox files
     const dropboxArchiveBucket = new s3.Bucket(this, DROPBOX_ARCHIVE_BUCKET_ID, {
-      bucketName: DROPBOX_ARCHIVE_BUCKET_NAME,
+      bucketName: `${DROPBOX_ARCHIVE_BUCKET_NAME}-${this.account}`,
       removalPolicy: cdk.RemovalPolicy.RETAIN,
     });
 
