@@ -30,6 +30,7 @@ export class MathPracsTutoringManagementPipelineStack extends cdk.Stack {
     const pipeline = new codepipeline.CodePipeline(this, 'Pipeline', {
       pipelineName: 'MathPracsTutoringManagementPipeline',
       pipelineType: cdk.aws_codepipeline.PipelineType.V2,
+      crossAccountKeys: true,
       synth: new codepipeline.ShellStep('Synth', {
         input: cdkSource,
         additionalInputs: {
@@ -42,6 +43,12 @@ export class MathPracsTutoringManagementPipelineStack extends cdk.Stack {
       }),
     });
 
-    pipeline.addStage(new MathPracsTutoringManagementStage(this, 'Prod'));
+    pipeline.addStage(new MathPracsTutoringManagementStage(this, 'Beta', {
+      env: { account: '655383751455', region: 'us-east-1' },
+    }));
+
+    pipeline.addStage(new MathPracsTutoringManagementStage(this, 'Prod', {
+      env: { account: '786802935034', region: 'us-east-1' },
+    }));
   }
 }
