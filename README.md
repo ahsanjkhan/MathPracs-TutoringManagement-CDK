@@ -61,7 +61,7 @@ aws secretsmanager update-secret --secret-id tutoring-api/dropbox-credentials-cd
 
 # Discord credentials
 aws secretsmanager update-secret --secret-id tutoring-api/discord-credentials-cdk \
-  --secret-string '{"bot_token":"...","application_id":"...","public_key":"...","guild_id":"...","bot_id":"...","session_feedback_channel_id":"...","muaz_student_payment_channel_id":"...","ahsan_student_payment_channel_id":"...","tutor_payment_channel_id":"...","tutors_chats_category_id":"...","dropbox_notifs_category_id":"...","session_feedbacks_category_id":"...","session_reminders_category_id":"..."}'
+  --secret-string '{"bot_token":"...","application_id":"...","public_key":"...","guild_id":"...","bot_id":"...","session_feedback_channel_id":"...","muaz_student_payment_channel_id":"...","ahsan_student_payment_channel_id":"...","tutor_payment_channel_id":"...","Tutors-Chats_category_id":"...","Dropbox-Notifs_category_id":"...","Session-Feedbacks_category_id":"...","Session-Reminders_category_id":"..."}'
 
 # Groq credentials
 aws secretsmanager update-secret --secret-id tutoring-api/groq-credentials-cdk \
