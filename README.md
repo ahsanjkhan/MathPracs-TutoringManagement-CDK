@@ -9,7 +9,7 @@ This CDK stack creates:
 1. **AWS CodePipeline** - Auto-deploys to Beta then Prod on merge into `main`
 2. **AWS Lambda Function** - FastAPI application with Mangum adapter
 3. **AWS API Gateway** - REST API with proxy integration
-4. **AWS DynamoDB Tables** - Sessions, CalendarListState, TutorsV2, TutorsMetadataV2, StudentsV2, StudentsMetadataV2, Transactions
+4. **AWS DynamoDB Tables** - Sessions, CalendarListState, TutorsV2, TutorsMetadataV2, StudentsV2, StudentsMetadataV2, Transactions, TutorTransactions, BusinessInternalDebts
 5. **AWS Secrets Manager** - Google, Dropbox, Discord, and Groq API credentials
 6. **AWS SSM Parameter Store** - Google Drive parent folder ID, Dropbox parent folder path
 7. **AWS EventBridge Rules** - Triggers session sync every 3 minutes, Dropbox archive weekly
@@ -148,7 +148,7 @@ These steps are done outside of CDK/code and must be performed manually for each
 ### Stack Dependencies
 
 This stack exports resources consumed by other stacks:
-- **MathPracsPaymentRemindersCDK**: Sessions, StudentsV2, StudentsMetadataV2, TutorsV2, TutorsMetadataV2, Transactions DynamoDB Tables, Discord API Secrets
+- **MathPracsPaymentRemindersCDK**: Sessions, StudentsV2, StudentsMetadataV2, TutorsV2, TutorsMetadataV2, Transactions, TutorTransactions, BusinessInternalDebts DynamoDB Tables, Discord API Secrets
 - **MathPracsSessionRemindersCDK**: Sessions, StudentsV2, StudentsMetadataV2, TutorsV2, TutorsMetadataV2 DynamoDB Tables, Discord API Secrets
 
 ### EventBridge Automation

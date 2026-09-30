@@ -155,6 +155,24 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
     });
 
+    // TutorTransactions table
+    const tutorTransactionsTable = new dynamodb.Table(this, 'TutorTransactionsTable', {
+      tableName: 'TutorTransactions',
+      partitionKey: { name: 'tutorId', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'transactionKey', type: dynamodb.AttributeType.STRING }, // format: "CREDIT#2026-03-01T18:00:00Z"
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
+    });
+
+    // BusinessInternalDebts table
+    const businessInternalDebtsTable = new dynamodb.Table(this, 'BusinessInternalDebtsTable', {
+      tableName: 'BusinessInternalDebts',
+      partitionKey: { name: 'debtTo', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'transactionKey', type: dynamodb.AttributeType.STRING }, // format: "DEBIT#2026-03-01T18:00:00Z"
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
+    });
+
     // Secrets for API credentials
     const googleCredentialsSecret = new secretsmanager.Secret(this, GOOGLE_CREDENTIALS_SECRET_ID, {
       secretName: GOOGLE_CREDENTIALS_SECRET_NAME,
@@ -254,6 +272,8 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
     studentsV2Table.grantReadWriteData(tutoringManagementLambda);
     studentsMetadataV2Table.grantReadWriteData(tutoringManagementLambda);
     transactionsTable.grantReadWriteData(tutoringManagementLambda);
+    tutorTransactionsTable.grantReadWriteData(tutoringManagementLambda);
+    businessInternalDebtsTable.grantReadWriteData(tutoringManagementLambda);
 
     googleCredentialsSecret.grantRead(tutoringManagementLambda);
     dropboxCredentialsSecret.grantRead(tutoringManagementLambda);
@@ -383,6 +403,16 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       description: 'Transactions DynamoDB Table Name'
     });
 
+    new cdk.CfnOutput(this, 'TutorTransactionsTableOutput', {
+      value: tutorTransactionsTable.tableName,
+      description: 'TutorTransactions DynamoDB Table Name'
+    });
+
+    new cdk.CfnOutput(this, 'BusinessInternalDebtsTableOutput', {
+      value: businessInternalDebtsTable.tableName,
+      description: 'BusinessInternalDebts DynamoDB Table Name'
+    });
+
     // Cross-stack exports for MathPracsSessionRemindersCDK
     new cdk.CfnOutput(this, 'SessionsTableArn', {
       value: sessionsTable.tableArn,
@@ -425,6 +455,18 @@ export class MathPracsTutoringManagementCdkStack extends cdk.Stack {
       value: transactionsTable.tableArn,
       description: 'ARN of Transactions DynamoDB Table',
       exportName: 'MathPracs-TransactionsTable-Arn'
+    });
+
+    new cdk.CfnOutput(this, 'TutorTransactionsTableArn', {
+      value: tutorTransactionsTable.tableArn,
+      description: 'ARN of TutorTransactions DynamoDB Table',
+      exportName: 'MathPracs-TutorTransactionsTable-Arn'
+    });
+
+    new cdk.CfnOutput(this, 'BusinessInternalDebtsTableArn', {
+      value: businessInternalDebtsTable.tableArn,
+      description: 'ARN of BusinessInternalDebts DynamoDB Table',
+      exportName: 'MathPracs-BusinessInternalDebtsTable-Arn'
     });
   }
 }
