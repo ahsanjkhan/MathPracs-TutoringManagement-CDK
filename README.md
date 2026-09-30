@@ -122,7 +122,7 @@ These steps are done outside of CDK/code and must be performed manually for each
         - Session-Feedbacks
         - Session Reminders
     - Ensure Admin role has Administrator permission toggled ON
-    - Register slash commands: `python3 -m src.scripts.register_discord_commands`
+    - Register slash commands (from MathPracs-TutoringManagement-API): `python3 -m scripts.register_discord_commands`. Re-run it in each account after any slash command is added or changed; it creates or updates commands one by one and never deletes existing ones.
 
 4. **Groq**
     - Create account at https://console.groq.com
